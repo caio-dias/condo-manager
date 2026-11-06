@@ -36,6 +36,7 @@ Acesse `http://localhost:3000`.
 
 ```sh
 npm test
+npm run typecheck
 npm run build
 ```
 

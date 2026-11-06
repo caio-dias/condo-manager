@@ -1,0 +1,16 @@
+{
+  "inputs": [],
+  "servers": {
+    "context7": {
+      "type": "stdio",
+      "command": "npx",
+      "args": ["-y", "@upstash/context7-mcp", "--api-key", "ctx7sk-04417ca2-6d20-4a0c-8389-3bf3e7608c36"]
+   },
+    "playwright": {
+      "command": "npx",
+      "args": [
+        "@playwright/mcp@latest"
+      ]
+    }
+  }   
+}

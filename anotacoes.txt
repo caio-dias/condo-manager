@@ -1,0 +1,34 @@
+site para referencias de layout:
+dribbble.com
+saaspo.com
+
+site para fazer o layout:
+https://stitch.withgoogle.com/
+
+https://nextjs.org/
+
+site para skills:
+skills.sh
+
+f7y9ogpl3swUXwGf
+
+workflow
+PRD - funcionalidade. 
+A - analise/revisão.
+T - tarefas, planejar implementação.
+E - execução
+C - confirmação
+
+> criação do prd via prompt, (usando a skill prd-generator), com plano explicativo, com regras de negocios.
+
+/prd-generator Vamos criar um sistema web para resolver problema do condominio, para moradores poderem fazer cadastro de ocorrencia com categoria, local, foto opcional, listar ocorrencias, filtrar por status e categoria.
+Moradores ao acessar o correncia poderia também adicionar comentario abaixo dela.
+
+- Podemos cadastrar moradores com nome completo, email, torre/apartamento, telefone sem necessidade de senha.
+Area do dashboard vai ser usado apenas por funcionarios do condominio também vamos ter um link para moradores acessarem com seu email e com isso visualizar as ocorrencias e poder abrir nova ocorrencia, acessar detalhe de uma ocorrencia, adicionar comentário nela.
+
+> criação do plano de implementação, usando o prd.
+> implementação do plano via prompt
+> confirmação, usando o teste de tela, e ajustando bugs, usando o modo agent explicando o bug.
+
+> criação da documentação do projeto, usando a skill documentation-writer

@@ -32,3 +32,24 @@ Area do dashboard vai ser usado apenas por funcionarios do condominio também va
 > confirmação, usando o teste de tela, e ajustando bugs, usando o modo agent explicando o bug.
 
 > criação da documentação do projeto, usando a skill documentation-writer
+
+prompt para futuros testes unitarios:
+
+Analise a funcionalidade que [ x | acabamos de implementar].
+
+Não escreva testes ainda.
+
+Identifique apenas comportamentos que realmente merecem testes automatizados considerando:
+- regras de negócio
+- dinheiro
+- autenticação/permissões
+- perda ou corrupção de dados
+- estados e transições
+- casos limite
+- integrações externas
+- regressões prováveis
+
+Ignore detalhes visuais e implementações triviais.
+
+Classifique cada teste sugerido como:
+CRÍTICO, IMPORTANTE ou DISPENSÁVEL.

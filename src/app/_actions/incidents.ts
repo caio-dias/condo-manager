@@ -11,15 +11,21 @@ import {
   getVerifiedPhotoType,
   MAX_PHOTO_BYTES,
 } from "@/lib/image-validation";
-import { commentSchema, idSchema, incidentSchema, statusSchema } from "@/lib/validation";
+import {
+  commentSchema,
+  idSchema,
+  incidentSchema,
+  statusSchema,
+} from "@/lib/validation";
 import type { ActionState } from "@/app/_actions/auth";
 
 export async function createIncidentAction(
   _previousState: ActionState,
-  formData: FormData,
+  formData: FormData
 ): Promise<ActionState> {
   const resident = await getResidentSession();
-  if (!resident) return { error: "Sua sessão terminou. Informe novamente seu e-mail." };
+  if (!resident)
+    return { error: "Sua sessão terminou. Informe novamente seu e-mail." };
 
   const parsed = incidentSchema.safeParse({
     title: formData.get("title"),
@@ -48,7 +54,10 @@ export async function createIncidentAction(
     const bytes = new Uint8Array(await file.arrayBuffer());
     const verifiedType = getVerifiedPhotoType(bytes);
     if (!verifiedType || verifiedType !== file.type) {
-      return { error: "O conteúdo do arquivo não corresponde a uma imagem JPEG, PNG ou WebP." };
+      return {
+        error:
+          "O conteúdo do arquivo não corresponde a uma imagem JPEG, PNG ou WebP.",
+      };
     }
 
     photoPath = `${resident.id}/${randomUUID()}`;
@@ -85,14 +94,20 @@ export async function createIncidentAction(
         .from("incident-photos")
         .remove([photoPath]);
       if (cleanupError) {
-        console.error("Falha ao limpar foto após erro ao criar ocorrência.", cleanupError);
+        console.error(
+          "Falha ao limpar foto após erro ao criar ocorrência.",
+          cleanupError
+        );
         return {
           error:
             "Não foi possível registrar a ocorrência nem limpar a foto enviada. Seus dados continuam no formulário; avise a administração sobre o arquivo pendente.",
         };
       }
     }
-    return { error: "Não foi possível registrar a ocorrência. Seus dados continuam no formulário." };
+    return {
+      error:
+        "Não foi possível registrar a ocorrência. Seus dados continuam no formulário.",
+    };
   }
 
   revalidatePath("/admin");
@@ -104,14 +119,16 @@ export async function createIncidentAction(
 export async function addResidentCommentAction(
   incidentId: string,
   _previousState: ActionState,
-  formData: FormData,
+  formData: FormData
 ): Promise<ActionState> {
   const resident = await getResidentSession();
-  if (!resident) return { error: "Sua sessão terminou. Informe novamente seu e-mail." };
+  if (!resident)
+    return { error: "Sua sessão terminou. Informe novamente seu e-mail." };
   const parsedId = idSchema.safeParse(incidentId);
   const parsedBody = commentSchema.safeParse({ body: formData.get("body") });
   if (!parsedId.success) return { error: "Ocorrência inválida." };
-  if (!parsedBody.success) return { error: parsedBody.error.issues[0]?.message };
+  if (!parsedBody.success)
+    return { error: parsedBody.error.issues[0]?.message };
 
   const admin = createSupabaseAdminClient();
   const { data: incident, error: incidentError } = await admin
@@ -121,7 +138,10 @@ export async function addResidentCommentAction(
     .maybeSingle();
 
   if (incidentError) {
-    console.error("Falha ao validar ocorrência para comentário.", incidentError);
+    console.error(
+      "Falha ao validar ocorrência para comentário.",
+      incidentError
+    );
     return { error: "Não foi possível enviar o comentário." };
   }
   if (!incident) return { error: "Esta ocorrência não está mais disponível." };
@@ -145,13 +165,14 @@ export async function addResidentCommentAction(
 export async function addAdminCommentAction(
   incidentId: string,
   _previousState: ActionState,
-  formData: FormData,
+  formData: FormData
 ): Promise<ActionState> {
   const adminSession = await requireAdminForAction();
   const parsedId = idSchema.safeParse(incidentId);
   const parsedBody = commentSchema.safeParse({ body: formData.get("body") });
   if (!parsedId.success) return { error: "Ocorrência inválida." };
-  if (!parsedBody.success) return { error: parsedBody.error.issues[0]?.message };
+  if (!parsedBody.success)
+    return { error: parsedBody.error.issues[0]?.message };
 
   const client = createSupabaseAdminClient();
   const { data: incident, error: incidentError } = await client
@@ -161,7 +182,10 @@ export async function addAdminCommentAction(
     .maybeSingle();
 
   if (incidentError) {
-    console.error("Falha ao validar ocorrência para comentário.", incidentError);
+    console.error(
+      "Falha ao validar ocorrência para comentário.",
+      incidentError
+    );
     return { error: "Não foi possível enviar o comentário." };
   }
   if (!incident) return { error: "Esta ocorrência não está mais disponível." };
@@ -182,12 +206,87 @@ export async function addAdminCommentAction(
   return { success: "Comentário adicionado." };
 }
 
-export async function updateIncidentStatusAction(
+export async function deleteResidentCommentAction(
+  incidentId: string,
+  commentId: string,
   _previousState: ActionState,
-  formData: FormData,
+  _formData: FormData
+): Promise<ActionState> {
+  const resident = await getResidentSession();
+  if (!resident)
+    return { error: "Sua sessão terminou. Informe novamente seu e-mail." };
+
+  const parsedIncidentId = idSchema.safeParse(incidentId);
+  const parsedCommentId = idSchema.safeParse(commentId);
+  if (!parsedIncidentId.success || !parsedCommentId.success) {
+    return { error: "Comentário inválido." };
+  }
+
+  const { data: deletedComment, error } = await createSupabaseAdminClient()
+    .from("comments")
+    .delete()
+    .eq("id", parsedCommentId.data)
+    .eq("incident_id", parsedIncidentId.data)
+    .eq("resident_author_id", resident.id)
+    .select("id")
+    .maybeSingle();
+
+  if (error) {
+    console.error("Falha ao excluir comentário de morador.", error);
+    return { error: "Não foi possível excluir o comentário. Tente novamente." };
+  }
+  if (!deletedComment) {
+    return { error: "Este comentário não está mais disponível para exclusão." };
+  }
+
+  revalidatePath(`/admin/incidents/${parsedIncidentId.data}`);
+  revalidatePath(`/resident/incidents/${parsedIncidentId.data}`);
+  return { success: "Comentário excluído." };
+}
+
+export async function deleteAdminCommentAction(
+  incidentId: string,
+  commentId: string,
+  _previousState: ActionState,
+  _formData: FormData
 ): Promise<ActionState> {
   await requireAdminForAction();
-  const incidentId = idSchema.safeParse(String(formData.get("incidentId") ?? ""));
+
+  const parsedIncidentId = idSchema.safeParse(incidentId);
+  const parsedCommentId = idSchema.safeParse(commentId);
+  if (!parsedIncidentId.success || !parsedCommentId.success) {
+    return { error: "Comentário inválido." };
+  }
+
+  const { data: deletedComment, error } = await createSupabaseAdminClient()
+    .from("comments")
+    .delete()
+    .eq("id", parsedCommentId.data)
+    .eq("incident_id", parsedIncidentId.data)
+    .select("id")
+    .maybeSingle();
+
+  if (error) {
+    console.error("Falha ao excluir comentário administrativo.", error);
+    return { error: "Não foi possível excluir o comentário. Tente novamente." };
+  }
+  if (!deletedComment) {
+    return { error: "Este comentário não está mais disponível para exclusão." };
+  }
+
+  revalidatePath(`/admin/incidents/${parsedIncidentId.data}`);
+  revalidatePath(`/resident/incidents/${parsedIncidentId.data}`);
+  return { success: "Comentário excluído." };
+}
+
+export async function updateIncidentStatusAction(
+  _previousState: ActionState,
+  formData: FormData
+): Promise<ActionState> {
+  await requireAdminForAction();
+  const incidentId = idSchema.safeParse(
+    String(formData.get("incidentId") ?? "")
+  );
   const status = statusSchema.safeParse(String(formData.get("status") ?? ""));
   if (!incidentId.success || !status.success) {
     return { error: "Ocorrência ou status inválido." };
@@ -200,7 +299,10 @@ export async function updateIncidentStatusAction(
 
   if (error) {
     console.error("Falha ao atualizar status da ocorrência.", error);
-    return { error: "Não foi possível atualizar o status. O valor anterior foi mantido." };
+    return {
+      error:
+        "Não foi possível atualizar o status. O valor anterior foi mantido.",
+    };
   }
 
   revalidatePath("/admin");
@@ -213,12 +315,15 @@ export async function updateIncidentStatusAction(
 
 export async function deleteResidentIncidentAction(
   _previousState: ActionState,
-  formData: FormData,
+  formData: FormData
 ): Promise<ActionState> {
   const resident = await getResidentSession();
-  if (!resident) return { error: "Sua sessão terminou. Informe novamente seu e-mail." };
+  if (!resident)
+    return { error: "Sua sessão terminou. Informe novamente seu e-mail." };
 
-  const incidentId = idSchema.safeParse(String(formData.get("incidentId") ?? ""));
+  const incidentId = idSchema.safeParse(
+    String(formData.get("incidentId") ?? "")
+  );
   if (!incidentId.success) return { error: "Ocorrência inválida." };
   const admin = createSupabaseAdminClient();
   const { data: incident, error: lookupError } = await admin
@@ -242,7 +347,10 @@ export async function deleteResidentIncidentAction(
 
     if (storageError) {
       console.error("Falha ao remover foto da ocorrência.", storageError);
-      return { error: "A ocorrência foi mantida porque sua foto não pôde ser removida." };
+      return {
+        error:
+          "A ocorrência foi mantida porque sua foto não pôde ser removida.",
+      };
     }
 
     const { error: pathError } = await admin
@@ -253,16 +361,21 @@ export async function deleteResidentIncidentAction(
     if (pathError) {
       console.error("Falha ao atualizar caminho da foto removida.", pathError);
       return {
-        error: "A foto foi removida, mas a ocorrência foi mantida. A exclusão não foi concluída.",
+        error:
+          "A foto foi removida, mas a ocorrência foi mantida. A exclusão não foi concluída.",
       };
     }
   }
 
-  const { error } = await admin.from("incidents").delete().eq("id", incident.id);
+  const { error } = await admin
+    .from("incidents")
+    .delete()
+    .eq("id", incident.id);
   if (error) {
     console.error("Falha ao excluir ocorrência.", error);
     return {
-      error: "Não foi possível excluir a ocorrência. Ela foi mantida e poderá ser excluída novamente.",
+      error:
+        "Não foi possível excluir a ocorrência. Ela foi mantida e poderá ser excluída novamente.",
     };
   }
 

@@ -85,7 +85,13 @@ textarea {
 .landing-page {
   min-height: 100vh;
   background:
-    linear-gradient(90deg, transparent 0, transparent calc(50% - 1px), rgb(0 53 95 / 4%) 50%, transparent calc(50% + 1px)),
+    linear-gradient(
+      90deg,
+      transparent 0,
+      transparent calc(50% - 1px),
+      rgb(0 53 95 / 4%) 50%,
+      transparent calc(50% + 1px)
+    ),
     var(--background);
 }
 
@@ -188,7 +194,9 @@ textarea {
   border-radius: 12px;
   background: var(--surface);
   box-shadow: var(--shadow);
-  transition: border-color 140ms ease, transform 140ms ease;
+  transition:
+    border-color 140ms ease,
+    transform 140ms ease;
 }
 
 .portal-option:hover {
@@ -321,7 +329,9 @@ textarea {
   font-weight: 650;
   line-height: 1.2;
   cursor: pointer;
-  transition: background-color 140ms ease, border-color 140ms ease;
+  transition:
+    background-color 140ms ease,
+    border-color 140ms ease;
 }
 
 .button:disabled {
@@ -1005,9 +1015,16 @@ textarea {
 
 .comment-heading {
   display: flex;
-  align-items: baseline;
+  align-items: flex-start;
   justify-content: space-between;
   gap: 12px;
+}
+
+.comment-author {
+  display: flex;
+  align-items: baseline;
+  flex-wrap: wrap;
+  gap: 4px 10px;
 }
 
 .comment-heading strong {
@@ -1024,6 +1041,39 @@ textarea {
   white-space: pre-wrap;
   overflow-wrap: anywhere;
   font-size: 14px;
+}
+
+.comment-delete-form {
+  display: grid;
+  justify-items: end;
+  gap: 6px;
+}
+
+.comment-delete-form .button {
+  min-height: 32px;
+  padding: 6px 10px;
+  font-size: 12px;
+}
+
+.comment-delete-form .form-feedback {
+  max-width: 260px;
+  padding: 6px 8px;
+}
+
+.comment-empty-state {
+  padding: 18px 0;
+  text-align: center;
+}
+
+.comment-empty-state h3 {
+  margin: 0 0 4px;
+  font-size: 14px;
+}
+
+.comment-empty-state p {
+  margin: 0;
+  color: var(--muted);
+  font-size: 13px;
 }
 
 .comment-form {

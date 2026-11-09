@@ -1,6 +1,6 @@
 # Visão geral do projeto
 
-Última atualização: 2026-11-06
+Última atualização: 2026-11-09
 
 ## Produto
 
@@ -13,14 +13,14 @@ O CondoManager — Residencial Aurora é uma aplicação web para moradores rela
 - Acessam o portal informando o e-mail previamente cadastrado pela administração.
 - Consultam e filtram ocorrências por status e categoria.
 - Registram ocorrências com título, descrição, categoria e local; foto é opcional.
-- Acompanham detalhes disponíveis e trocam comentários com a administração.
+- Acompanham detalhes disponíveis, trocam comentários com a administração e podem excluir os próprios comentários.
 
 ### Administração
 
 - Acessa o painel com e-mail e senha do Supabase Auth.
 - Cadastra e remove moradores.
 - Consulta e filtra ocorrências por status e categoria.
-- Atualiza o status e adiciona comentários nas ocorrências.
+- Atualiza o status, adiciona comentários e pode excluir qualquer comentário nas ocorrências.
 - A conta inicial exige troca de senha antes de usar o painel.
 
 ## Dados principais
@@ -34,18 +34,18 @@ Categorias: Manutenção / infraestrutura, Limpeza, Ruído / convivência, Segur
 
 ## Rotas principais
 
-| Caminho | Uso |
-| --- | --- |
-| `/` | Seleção do portal de morador ou administração |
-| `/resident/access` | Acesso do morador pelo e-mail cadastrado |
-| `/resident/incidents` | Lista e filtros de ocorrências |
-| `/resident/incidents/new` | Cadastro de ocorrência |
-| `/resident/incidents/[id]` | Detalhes e comentários |
-| `/admin/login` | Login administrativo e configuração inicial local |
-| `/admin/change-password` | Troca obrigatória de senha |
-| `/admin/incidents` | Lista e gestão de ocorrências |
-| `/admin/incidents/[id]` | Detalhes, status e comentários |
-| `/admin/residents` | Cadastro e gestão de moradores |
+| Caminho                    | Uso                                               |
+| -------------------------- | ------------------------------------------------- |
+| `/`                        | Seleção do portal de morador ou administração     |
+| `/resident/access`         | Acesso do morador pelo e-mail cadastrado          |
+| `/resident/incidents`      | Lista e filtros de ocorrências                    |
+| `/resident/incidents/new`  | Cadastro de ocorrência                            |
+| `/resident/incidents/[id]` | Detalhes e comentários                            |
+| `/admin/login`             | Login administrativo e configuração inicial local |
+| `/admin/change-password`   | Troca obrigatória de senha                        |
+| `/admin/incidents`         | Lista e gestão de ocorrências                     |
+| `/admin/incidents/[id]`    | Detalhes, status e comentários                    |
+| `/admin/residents`         | Cadastro e gestão de moradores                    |
 
 ## Limites atuais
 

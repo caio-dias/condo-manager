@@ -2,12 +2,12 @@
 
 Aplicação web para registrar e acompanhar ocorrências de um condomínio.
 
-Última atualização: 2026-11-06
+Última atualização: 2026-11-09
 
 ## Funcionalidades
 
-- Administração: login, troca obrigatória da senha inicial, cadastro e remoção de moradores, listagem e filtragem de ocorrências, atualização de status e comentários.
-- Moradores: acesso pelo e-mail cadastrado, listagem e filtragem de ocorrências, criação de ocorrências com foto opcional e comentários.
+- Administração: login, troca obrigatória da senha inicial, cadastro e remoção de moradores, listagem e filtragem de ocorrências, atualização de status, comentários e exclusão de qualquer comentário.
+- Moradores: acesso pelo e-mail cadastrado, listagem e filtragem de ocorrências, criação de ocorrências com foto opcional, comentários e exclusão dos próprios comentários.
 - Ocorrências usam categorias e status definidos pelo sistema; fotos são armazenadas em bucket privado.
 
 Veja a [visão geral do produto](./docs/project-overview.md) e a [arquitetura](./docs/architecture.md) para mais detalhes.
